@@ -19,8 +19,8 @@
  *  }, ...]
  * }
  */
-class Masaic {
-    constructor(context, { tileWidth = 20, tileHeight = 40, brushSize = 3 } = {}) {
+class Mosaic {
+    constructor(context, { tileWidth = 20, tileHeight = 20, brushSize = 3 } = {}) {
         const { canvas } = context;
 
         this.context = context;
@@ -72,8 +72,8 @@ class Masaic {
         }
     }
 
-    drawTile(tile) {
-        const tiles = [].concat(tile);
+    drawTile(tiles) {
+        tiles = [].concat(tiles);
         tiles.forEach((tile) => {
             if (tile.isFilled) {
                 return false; // Already filled.
@@ -119,6 +119,11 @@ class Masaic {
         this.drawTile(tile);
     }
 
+    eraseTileByPoint(x, y) {
+        const tile = this.getTilesByPoint(x, y);
+        this.eraseTile(tile);
+    }
+
     getTilesByPoint(x, y, isBrushSize = true) {
         const tiles = [];
 
@@ -143,52 +148,31 @@ class Masaic {
         return tiles;
     }
 
-}
-
-function drawImageToCanvas(imageUrl) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    document.body.appendChild(canvas);
-
-    return new Promise((resolve, reject) => {
-        const image = new Image();
-
-        image.onload = function() {
-            canvas.width = this.width;
-            canvas.height = this.height;
-
-            ctx.drawImage(this, 0, 0, this.width, this.height);
-
-            resolve(ctx);
-        }
-
-        image.src = imageUrl;
-    });
-}
-
-drawImageToCanvas('./image/xx.jpg').then(ctx => {
-    const masaic =  new Masaic(ctx);
-
-    const MouseEvents = {
-        bind() {
-            masaic.context.canvas.addEventListener('mousedown', MouseEvents.mousedown);
-        },
-
-        mousedown() {
-            masaic.context.canvas.addEventListener('mousemove', MouseEvents.mousemove);
-            masaic.context.canvas.addEventListener('mouseup', MouseEvents.mouseup);
-        },
-
-        mousemove(e) {
-            masaic.drawTileByPoint(e.layerX, e.layerY);
-        },
-
-        mouseup() {
-            masaic.context.canvas.removeEventListener('mousemove', MouseEvents.mousemove);
-            masaic.context.canvas.removeEventListener('mouseup', MouseEvents.mouseup);
-        }
+    drawAllTiles() {
+        this.drawTile(this.tiles);
     }
-    MouseEvents.bind();
 
-});
+    eraseTile(tiles) {
+        [].concat(tiles).forEach((tile) => {
+            const x = tile.column * this.tileWidth;
+            const y = tile.row * this.tileHeight;
+            const w = tile.pixelWidth;
+            const h = tile.pixelHeight;
 
+            var imgData = this.context.createImageData(w, h);
+
+            tile.data.forEach((val, i) => {
+                imgData.data[i] = val;
+            })
+
+            this.context.clearRect(x, y, w, h); // Clear.
+            this.context.putImageData(imgData, x, y); // Draw.
+
+            tile.isFilled = false;
+        });
+    }
+
+    eraseAllTiles(tiles) {
+        this.eraseTile(this.tiles);
+    }
+}
