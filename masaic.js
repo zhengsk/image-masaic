@@ -19,9 +19,9 @@
  * }
  */
 class Masaic {
-    constructor(context, { tileWidth = 20, tileHeight = 20 } = {}) {
+    constructor(context, { tileWidth = 20, tileHeight = 20, brushSize = 1 } = {}) {
         const { canvas } = context;
-
+        this.brushSize = brushSize;
         this.context = context;
         this.tileWidth = tileWidth;
         this.tileHeight = tileHeight;
@@ -74,41 +74,71 @@ class Masaic {
     }
 
     drawTile(tile) {
-        if (!tile.color) {
-            console.info('xxx');
-            let r = 0, g = 0, b = 0, a = 0;
-            let w = 0;
-            for (let i = 0, len = tile.data.length; i < len; i += 4) {
-                r += tile.data[i];
-                g += tile.data[i + 1];
-                b += tile.data[i + 2];
-                a += tile.data[i + 3];
+        const tiles = [].concat(tile);
+        tiles.forEach((tile) => {
+            if (!tile.color) {
+                console.info('xxx');
+                let r = 0, g = 0, b = 0, a = 0;
+                let w = 0;
+                for (let i = 0, len = tile.data.length; i < len; i += 4) {
+                    r += tile.data[i];
+                    g += tile.data[i + 1];
+                    b += tile.data[i + 2];
+                    a += tile.data[i + 3];
+                }
+
+                tile.color = [
+                    parseInt(r / tile.data.length / 4, 10),
+                    parseInt(g / tile.data.length / 4, 10),
+                    parseInt(b / tile.data.length / 4, 10),
+                    parseInt(a / tile.data.length / 4, 10),
+                ];
+
+                // console.info(tile.color);
             }
 
-            tile.color = [
-                parseInt(r / tile.data.length / 4, 10),
-                parseInt(g / tile.data.length / 4, 10),
-                parseInt(b / tile.data.length / 4, 10),
-                parseInt(a / tile.data.length / 4, 10),
-            ];
-
-            // console.info(tile.color);
-        }
-
-        // console.info(`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`);
-        this.context.fillStyle=`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`;
-        this.context.fillRect(tile.column * this.tileHeight, tile.row * this.tileWidth,  tile.pixelWidth, tile.pixelHeight);
+            // console.info(`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`);
+            this.context.fillStyle=`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`;
+            this.context.fillRect(tile.column * this.tileHeight, tile.row * this.tileWidth,  tile.pixelWidth, tile.pixelHeight);
+        });
     }
 
     drawTileByPoint(x, y) {
-        const tile = this.getTileByPoint(x, y);
+        const tile = this.getTilesByPoint(x, y);
         this.drawTile(tile);
     }
 
-    getTileByPoint(x, y) {
-        const column = Math.floor(x / this.tileWidth);
-        const row = Math.floor(y / this.tileHeight);
-        return this.tiles[row * this.tileColumnSize + column];
+    getTilesByPoint(x, y, extend = true) {
+        const tiles = [];
+        let column = Math.floor(x / this.tileWidth);
+        let row = Math.floor(y / this.tileHeight);
+
+        tiles.push(this.tiles[row * this.tileColumnSize + column]);
+
+        if (extend) {
+            let brushSize = this.brushSize;
+            while (brushSize > 0) {
+                column = Math.min(Math.floor(x / this.tileWidth) + extend, this.tileColumnSize - 1);
+                row = Math.min(Math.floor(y / this.tileHeight), this.tileRowSize - 1);
+                tiles.push(this.tiles[row * this.tileColumnSize + column]);
+
+                column = Math.min(Math.floor(x / this.tileWidth) - extend, this.tileColumnSize - 1);
+                row = Math.min(Math.floor(y / this.tileHeight), this.tileRowSize - 1);
+                tiles.push(this.tiles[row * this.tileColumnSize + column]);
+
+                column = Math.min(Math.floor(x / this.tileWidth), this.tileColumnSize - 1);
+                row = Math.min(Math.floor(y / this.tileHeight) + extend, this.tileRowSize - 1);
+                tiles.push(this.tiles[row * this.tileColumnSize + column]);
+
+                column = Math.min(Math.floor(x / this.tileWidth), this.tileColumnSize - 1);
+                row = Math.min(Math.floor(y / this.tileHeight) - extend, this.tileRowSize - 1);
+                tiles.push(this.tiles[row * this.tileColumnSize + column]);
+
+                brushSize -= 1;
+            }
+        }
+        console.info(tiles.length)
+        return tiles;
     }
 
 }
