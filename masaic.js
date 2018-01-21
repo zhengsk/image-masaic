@@ -20,7 +20,7 @@
  * }
  */
 class Masaic {
-    constructor(context, { tileWidth = 20, tileHeight = 20, brushSize = 3 } = {}) {
+    constructor(context, { tileWidth = 20, tileHeight = 40, brushSize = 3 } = {}) {
         const { canvas } = context;
 
         this.context = context;
@@ -76,8 +76,7 @@ class Masaic {
         const tiles = [].concat(tile);
         tiles.forEach((tile) => {
             if (tile.isFilled) {
-                // Already filled.
-                return false;
+                return false; // Already filled.
             }
 
             if (!tile.color) {
@@ -99,10 +98,18 @@ class Masaic {
                     a: parseInt(a / pixelLen, 10),
                 };
             }
+
             const color = tile.color;
             this.context.fillStyle=`rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`;
-            this.context.clearRect(tile.column * this.tileHeight, tile.row * this.tileWidth,  tile.pixelWidth, tile.pixelHeight);
-            this.context.fillRect(tile.column * this.tileHeight, tile.row * this.tileWidth,  tile.pixelWidth, tile.pixelHeight);
+
+            const x = tile.column * this.tileWidth;
+            const y = tile.row * this.tileHeight;
+            const w = tile.pixelWidth;
+            const h = tile.pixelHeight;
+
+            this.context.clearRect(x, y, w, h); // Clear.
+            this.context.fillRect(x, y, w, h); // Draw.
+
             tile.isFilled = true;
         });
     }
@@ -112,19 +119,18 @@ class Masaic {
         this.drawTile(tile);
     }
 
-    getTilesByPoint(x, y, brushSize = true) {
+    getTilesByPoint(x, y, isBrushSize = true) {
         const tiles = [];
-        let column = Math.floor(x / this.tileWidth);
-        let row = Math.floor(y / this.tileHeight);
 
-        if (brushSize) {
+        if (isBrushSize) {
             let brushSize = this.brushSize;
-            let startRow = Math.max(0, Math.ceil(row - brushSize / 2));
-            let startColumn = Math.max(0, Math.ceil(column - brushSize / 2));
+            let startRow = Math.max(0, Math.floor(y / this.tileHeight) - Math.floor(brushSize / 2));
+            let startColumn = Math.max(0, Math.floor(x / this.tileWidth) - Math.floor(brushSize / 2));
 
-            let endRow = Math.min(this.tileRowSize, Math.ceil(row + brushSize / 2));
-            let endColumn = Math.min(this.tileColumnSize, Math.ceil(column + brushSize / 2));
+            let endRow = Math.min(this.tileRowSize, startRow + brushSize);
+            let endColumn = Math.min(this.tileColumnSize, startColumn + brushSize);
 
+            // Get tiles.
             while (startRow < endRow) {
                 let column = startColumn;
                 while (column < endColumn) {
@@ -134,12 +140,10 @@ class Masaic {
                 startRow += 1;
             }
         }
-        // console.info(tiles.length)
         return tiles;
     }
 
 }
-
 
 function drawImageToCanvas(imageUrl) {
     const canvas = document.createElement('canvas');
@@ -162,47 +166,8 @@ function drawImageToCanvas(imageUrl) {
     });
 }
 
-drawImageToCanvas('./image/zz.png').then(ctx => {
-    window.masaic =  new Masaic(ctx);
-
-    let x = 0;
-    // setInterval(() => {
-    //     console.info(`row: ${masaic.tiles[x].row},column: ${masaic.tiles[x].column}`);
-    //     masaic.drawTile(masaic.tiles[x]);
-    //     x++;
-    // }, 100);
-
-    // const draw = () => {
-    //     if (masaic.tiles[x]) {
-    //         // console.info(x);
-    //         masaic.drawTile(masaic.tiles[x]);
-    //         x++;
-    //         draw();
-    //     } else {
-    //         // console.timeEnd('xx');
-    //     }
-    // };
-
-    // setTimeout(() => {
-    //     // console.time('xx');
-    //     window.requestAnimationFrame(draw);
-    // }, 2000);
-
-    // console.time('xx');
-    // while(masaic.tiles[x]) {
-    //     masaic.drawTile(masaic.tiles[x]);
-    //     ++x;
-    // }
-    // console.timeEnd('xx');
-
-    // setTimeout(() => {
-    //     console.time('xx');
-    //     while(masaic.tiles[x]) {
-    //         masaic.drawTile(masaic.tiles[x]);
-    //         ++x;
-    //     }
-    //     console.timeEnd('xx');
-    // }, 2000);
+drawImageToCanvas('./image/xx.jpg').then(ctx => {
+    const masaic =  new Masaic(ctx);
 
     const MouseEvents = {
         bind() {
@@ -224,7 +189,6 @@ drawImageToCanvas('./image/zz.png').then(ctx => {
         }
     }
     MouseEvents.bind();
-
 
 });
 
