@@ -15,6 +15,7 @@
  *      pixelHeight,
  *      data,
  *      color,
+ *      isFilled,
  *  }, ...]
  * }
  */
@@ -74,6 +75,11 @@ class Masaic {
     drawTile(tile) {
         const tiles = [].concat(tile);
         tiles.forEach((tile) => {
+            if (tile.isFilled) {
+                // Already filled.
+                return false;
+            }
+
             if (!tile.color) {
                 let dataLen = tile.data.length;
                 let r = 0, g = 0, b = 0, a = 0;
@@ -95,7 +101,9 @@ class Masaic {
             }
             const color = tile.color;
             this.context.fillStyle=`rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`;
+            this.context.clearRect(tile.column * this.tileHeight, tile.row * this.tileWidth,  tile.pixelWidth, tile.pixelHeight);
             this.context.fillRect(tile.column * this.tileHeight, tile.row * this.tileWidth,  tile.pixelWidth, tile.pixelHeight);
+            tile.isFilled = true;
         });
     }
 
