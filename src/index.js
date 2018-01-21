@@ -1,3 +1,4 @@
+import Mosaic from './scripts/mosaic';
 
 function drawImageToCanvas(imageUrl) {
     const canvas = document.createElement('canvas');
@@ -6,7 +7,7 @@ function drawImageToCanvas(imageUrl) {
 
     return new Promise((resolve, reject) => {
         const image = new Image();
-
+        image.crossOrigin = 'Annoymous'
         image.onload = function() {
             canvas.width = this.width;
             canvas.height = this.height;
@@ -20,7 +21,7 @@ function drawImageToCanvas(imageUrl) {
     });
 }
 
-drawImageToCanvas('./image/xx.jpg').then(ctx => {
+drawImageToCanvas('https://st0.dancf.com/www/66919939/design/20180022-000927-4.jpg').then(ctx => {
     const mosaic =  new Mosaic(ctx);
 
     const MouseEvents = {

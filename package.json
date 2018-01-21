@@ -1,0 +1,31 @@
+{
+  "name": "image-mosaic",
+  "version": "1.0.0",
+  "description": "Set image mosaic.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server --host 0.0.0.0",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhengsk/canvas-masaic.git"
+  },
+  "keywords": [
+    "mosaic"
+  ],
+  "author": "zark",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/zhengsk/canvas-masaic/issues"
+  },
+  "homepage": "https://github.com/zhengsk/canvas-masaic#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.1",
+    "html-webpack-plugin": "^2.30.1",
+    "webpack": "^3.10.0",
+    "webpack-dev-server": "^2.11.1"
+  }
+}

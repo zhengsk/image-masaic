@@ -176,3 +176,5 @@ class Mosaic {
         this.eraseTile(this.tiles);
     }
 }
+
+export default Mosaic;
