@@ -19,7 +19,7 @@
  * }
  */
 class Masaic {
-    constructor(context, { tileWidth = 50, tileHeight = 50 } = {}) {
+    constructor(context, { tileWidth = 20, tileHeight = 20 } = {}) {
         const { canvas } = context;
 
         this.context = context;
@@ -66,7 +66,6 @@ class Masaic {
             const data = [];
             for (let i = 0, j = tile.pixelHeight; i < j; i++) {
                 const pixelPosition = this.width * 4 * this.tileHeight * tile.row + tile.column * this.tileWidth * 4;
-                console.info(pixelPosition + this.width * 4 * i, pixelPosition + this.width * 4 * i + tile.pixelWidth * 4);
                 data.push.apply(data, imageData.slice(pixelPosition + this.width * 4 * i, pixelPosition + this.width * 4 * i + tile.pixelWidth * 4));
             };
 
@@ -76,28 +75,40 @@ class Masaic {
 
     drawTile(tile) {
         if (!tile.color) {
+            console.info('xxx');
             let r = 0, g = 0, b = 0, a = 0;
-
-            for (let i = 0, len = tile.data.length; i < len; i++) {
-                for (let m = 0, n = tile.data[i].length; m < n; m += 4) {
-                    r += tile.data[i];
-                    g += tile.data[i + 1];
-                    b += tile.data[i + 2];
-                    a += tile.data[i + 3];
-                }
+            let w = 0;
+            for (let i = 0, len = tile.data.length; i < len; i += 4) {
+                r += tile.data[i];
+                g += tile.data[i + 1];
+                b += tile.data[i + 2];
+                a += tile.data[i + 3];
             }
 
             tile.color = [
-                parseInt(r / tile.data.length * tile.pixelWidth, 10),
-                parseInt(g / tile.data.length * tile.pixelWidth, 10),
-                parseInt(b / tile.data.length * tile.pixelWidth, 10),
-                parseInt(a / tile.data.length * tile.pixelWidth, 10),
+                parseInt(r / tile.data.length / 4, 10),
+                parseInt(g / tile.data.length / 4, 10),
+                parseInt(b / tile.data.length / 4, 10),
+                parseInt(a / tile.data.length / 4, 10),
             ];
+
+            // console.info(tile.color);
         }
 
-        console.info(`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`);
+        // console.info(`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`);
         this.context.fillStyle=`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`;
         this.context.fillRect(tile.column * this.tileHeight, tile.row * this.tileWidth,  tile.pixelWidth, tile.pixelHeight);
+    }
+
+    drawTileByPoint(x, y) {
+        const tile = this.getTileByPoint(x, y);
+        this.drawTile(tile);
+    }
+
+    getTileByPoint(x, y) {
+        const column = Math.floor(x / this.tileWidth);
+        const row = Math.floor(y / this.tileHeight);
+        return this.tiles[row * this.tileColumnSize + column];
     }
 
 }
@@ -129,26 +140,26 @@ drawImageToCanvas('./image/meinv.jpeg').then(ctx => {
 
     let x = 0;
     // setInterval(() => {
-    //     console.info(x);
+    //     console.info(`row: ${masaic.tiles[x].row},column: ${masaic.tiles[x].column}`);
     //     masaic.drawTile(masaic.tiles[x]);
     //     x++;
-    // }, 1);
+    // }, 100);
 
-    const draw = () => {
-        if (masaic.tiles[x]) {
-            console.info(x);
-            masaic.drawTile(masaic.tiles[x]);
-            x++;
-            draw();
-        } else {
-            console.timeEnd('xx');
-        }
-    };
+    // const draw = () => {
+    //     if (masaic.tiles[x]) {
+    //         // console.info(x);
+    //         masaic.drawTile(masaic.tiles[x]);
+    //         x++;
+    //         draw();
+    //     } else {
+    //         // console.timeEnd('xx');
+    //     }
+    // };
 
-    setTimeout(() => {
-        console.time('xx');
-        window.requestAnimationFrame(draw);
-    }, 2000);
+    // setTimeout(() => {
+    //     // console.time('xx');
+    //     window.requestAnimationFrame(draw);
+    // }, 2000);
 
     // console.time('xx');
     // while(masaic.tiles[x]) {
@@ -165,6 +176,28 @@ drawImageToCanvas('./image/meinv.jpeg').then(ctx => {
     //     }
     //     console.timeEnd('xx');
     // }, 2000);
+
+    const MouseEvents = {
+        bind() {
+            masaic.context.canvas.addEventListener('mousedown', MouseEvents.mousedown);
+        },
+
+        mousedown() {
+            masaic.context.canvas.addEventListener('mousemove', MouseEvents.mousemove);
+            masaic.context.canvas.addEventListener('mouseup', MouseEvents.mouseup);
+        },
+
+        mousemove(e) {
+            masaic.drawTileByPoint(e.layerX, e.layerY);
+        },
+
+        mouseup() {
+            masaic.context.canvas.removeEventListener('mousemove', MouseEvents.mousemove);
+            masaic.context.canvas.removeEventListener('mouseup', MouseEvents.mouseup);
+        }
+    }
+    MouseEvents.bind();
+
 
 });
 
