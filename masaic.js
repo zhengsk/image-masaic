@@ -1,11 +1,11 @@
 /**
  * {
  *  context,
- *  tileWidth,
- *  tileHeight,
+ *  imageData,
  *  width,
  *  height,
- *  imageData,
+ *  tileWidth,
+ *  tileHeight,
  *  tileRowSize,
  *  tileColumnSize,
  *  tiles: [{
@@ -19,25 +19,29 @@
  * }
  */
 class Masaic {
-    constructor(context, { tileWidth = 20, tileHeight = 20, brushSize = 1 } = {}) {
+    constructor(context, { tileWidth = 20, tileHeight = 20, brushSize = 3 } = {}) {
         const { canvas } = context;
-        this.brushSize = brushSize;
+
         this.context = context;
-        this.tileWidth = tileWidth;
-        this.tileHeight = tileHeight;
+        this.brushSize = brushSize;
+
         this.width = canvas.width;
         this.height = canvas.height;
 
+        this.tileWidth = tileWidth;
+        this.tileHeight = tileHeight;
+
         const { width, height } = this;
+
         this.imageData = context.getImageData(0, 0, width, height).data;
         this.tileRowSize = Math.ceil(height / this.tileHeight);
         this.tileColumnSize = Math.ceil(width / this.tileWidth);
 
         this.tiles = []; // All image tiles.
 
+        // Set tiles.
         for (let i = 0; i < this.tileRowSize; i++) {
             for (let j = 0; j < this.tileColumnSize; j++) {
-
                 const tile = {
                     row: i,
                     column: j,
@@ -53,52 +57,44 @@ class Masaic {
                     tile.pixelHeight = height - (i * tileHeight);
                 }
 
+                // Set tile data;
+                const data = [];
+                const pixelPosition = this.width * 4 * this.tileHeight * tile.row + tile.column * this.tileWidth * 4;
+                for (let i = 0, j = tile.pixelHeight; i < j; i++) {
+                    const position = pixelPosition + this.width * 4 * i;
+                    data.push.apply(data, this.imageData.slice(position, position + tile.pixelWidth * 4));
+                };
+                tile.data = data;
+
                 this.tiles.push(tile);
             }
         }
-
-        this.setTilesData();
-    }
-
-    setTilesData() {
-        const imageData = this.imageData;
-        this.tiles.forEach(tile => {
-            const data = [];
-            for (let i = 0, j = tile.pixelHeight; i < j; i++) {
-                const pixelPosition = this.width * 4 * this.tileHeight * tile.row + tile.column * this.tileWidth * 4;
-                data.push.apply(data, imageData.slice(pixelPosition + this.width * 4 * i, pixelPosition + this.width * 4 * i + tile.pixelWidth * 4));
-            };
-
-            tile.data = data;
-        });
     }
 
     drawTile(tile) {
         const tiles = [].concat(tile);
         tiles.forEach((tile) => {
             if (!tile.color) {
-                console.info('xxx');
+                let dataLen = tile.data.length;
                 let r = 0, g = 0, b = 0, a = 0;
-                let w = 0;
-                for (let i = 0, len = tile.data.length; i < len; i += 4) {
+                for (let i = 0; i < dataLen; i += 4) {
                     r += tile.data[i];
                     g += tile.data[i + 1];
                     b += tile.data[i + 2];
                     a += tile.data[i + 3];
                 }
 
-                tile.color = [
-                    parseInt(r / tile.data.length / 4, 10),
-                    parseInt(g / tile.data.length / 4, 10),
-                    parseInt(b / tile.data.length / 4, 10),
-                    parseInt(a / tile.data.length / 4, 10),
-                ];
-
-                // console.info(tile.color);
+                // Set tile color.
+                let pixelLen = dataLen / 4;
+                tile.color = {
+                    r: parseInt(r / pixelLen, 10),
+                    g: parseInt(g / pixelLen, 10),
+                    b: parseInt(b / pixelLen, 10),
+                    a: parseInt(a / pixelLen, 10),
+                };
             }
-
-            // console.info(`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`);
-            this.context.fillStyle=`#${tile.color[0].toString(16)}${tile.color[1].toString(16)}${tile.color[2].toString(16)}`;
+            const color = tile.color;
+            this.context.fillStyle=`rgba(${color.r}, ${color.g}, ${color.b}, ${color.a / 255})`;
             this.context.fillRect(tile.column * this.tileHeight, tile.row * this.tileWidth,  tile.pixelWidth, tile.pixelHeight);
         });
     }
@@ -108,36 +104,29 @@ class Masaic {
         this.drawTile(tile);
     }
 
-    getTilesByPoint(x, y, extend = true) {
+    getTilesByPoint(x, y, brushSize = true) {
         const tiles = [];
         let column = Math.floor(x / this.tileWidth);
         let row = Math.floor(y / this.tileHeight);
 
-        tiles.push(this.tiles[row * this.tileColumnSize + column]);
-
-        if (extend) {
+        if (brushSize) {
             let brushSize = this.brushSize;
-            while (brushSize > 0) {
-                column = Math.min(Math.floor(x / this.tileWidth) + extend, this.tileColumnSize - 1);
-                row = Math.min(Math.floor(y / this.tileHeight), this.tileRowSize - 1);
-                tiles.push(this.tiles[row * this.tileColumnSize + column]);
+            let startRow = Math.max(0, Math.ceil(row - brushSize / 2));
+            let startColumn = Math.max(0, Math.ceil(column - brushSize / 2));
 
-                column = Math.min(Math.floor(x / this.tileWidth) - extend, this.tileColumnSize - 1);
-                row = Math.min(Math.floor(y / this.tileHeight), this.tileRowSize - 1);
-                tiles.push(this.tiles[row * this.tileColumnSize + column]);
+            let endRow = Math.min(this.tileRowSize, Math.ceil(row + brushSize / 2));
+            let endColumn = Math.min(this.tileColumnSize, Math.ceil(column + brushSize / 2));
 
-                column = Math.min(Math.floor(x / this.tileWidth), this.tileColumnSize - 1);
-                row = Math.min(Math.floor(y / this.tileHeight) + extend, this.tileRowSize - 1);
-                tiles.push(this.tiles[row * this.tileColumnSize + column]);
-
-                column = Math.min(Math.floor(x / this.tileWidth), this.tileColumnSize - 1);
-                row = Math.min(Math.floor(y / this.tileHeight) - extend, this.tileRowSize - 1);
-                tiles.push(this.tiles[row * this.tileColumnSize + column]);
-
-                brushSize -= 1;
+            while (startRow < endRow) {
+                let column = startColumn;
+                while (column < endColumn) {
+                    tiles.push(this.tiles[startRow * this.tileColumnSize + column]);
+                    column += 1;
+                }
+                startRow += 1;
             }
         }
-        console.info(tiles.length)
+        // console.info(tiles.length)
         return tiles;
     }
 
@@ -165,7 +154,7 @@ function drawImageToCanvas(imageUrl) {
     });
 }
 
-drawImageToCanvas('./image/meinv.jpeg').then(ctx => {
+drawImageToCanvas('./image/zz.png').then(ctx => {
     window.masaic =  new Masaic(ctx);
 
     let x = 0;
