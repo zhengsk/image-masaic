@@ -2,9 +2,13 @@
   "name": "image-mosaic",
   "version": "1.0.0",
   "description": "Set image mosaic.",
-  "main": "index.js",
+  "main": "./lib/index.js",
+  "files": [
+    "lib"
+  ],
   "scripts": {
     "dev": "webpack-dev-server --host 0.0.0.0",
+    "release": "webpack --config ./webpack.config/release.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,6 +29,7 @@
     "babel-loader": "^7.1.2",
     "babel-preset-env": "^1.6.1",
     "html-webpack-plugin": "^2.30.1",
+    "uglifyjs-webpack-plugin": "^1.1.6",
     "webpack": "^3.10.0",
     "webpack-dev-server": "^2.11.1"
   }
