@@ -1,6 +1,6 @@
 {
   "name": "image-mosaic",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Set image mosaic.",
   "main": "./lib/index.js",
   "files": [
