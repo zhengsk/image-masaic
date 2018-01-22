@@ -21,7 +21,7 @@ function drawImageToCanvas(imageUrl) {
     });
 }
 
-drawImageToCanvas('https://cjxq.oss.aliyuncs.com/cjxq/20180018-182801108-264-1.png').then(ctx => {
+drawImageToCanvas('https://raw.githubusercontent.com/zhengsk/image-masaic/master/src/images/demon.jpg').then(ctx => {
     const mosaic =  new Mosaic(ctx);
 
     const MouseEvents = {
@@ -49,6 +49,13 @@ drawImageToCanvas('https://cjxq.oss.aliyuncs.com/cjxq/20180018-182801108-264-1.p
     }
     MouseEvents.init();
 
+    document.querySelector('#drawAll').addEventListener('click', () => {
+        mosaic.drawAllTiles();
+    });
+
+    document.querySelector('#clearAll').addEventListener('click', () => {
+        mosaic.eraseAllTiles();
+    });
 
 });
 

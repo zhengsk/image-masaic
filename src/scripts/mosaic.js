@@ -119,11 +119,6 @@ class Mosaic {
         this.drawTile(tile);
     }
 
-    eraseTileByPoint(x, y) {
-        const tile = this.getTilesByPoint(x, y);
-        this.eraseTile(tile);
-    }
-
     getTilesByPoint(x, y, isBrushSize = true) {
         const tiles = [];
 
@@ -170,6 +165,11 @@ class Mosaic {
 
             tile.isFilled = false;
         });
+    }
+
+    eraseTileByPoint(x, y) {
+        const tile = this.getTilesByPoint(x, y);
+        this.eraseTile(tile);
     }
 
     eraseAllTiles(tiles) {
