@@ -21,7 +21,7 @@ function drawImageToCanvas(imageUrl) {
     });
 }
 
-drawImageToCanvas('https://st0.dancf.com/www/66919939/design/20180022-000927-4.jpg').then(ctx => {
+drawImageToCanvas('https://cjxq.oss.aliyuncs.com/cjxq/20180018-182801108-264-1.png').then(ctx => {
     const mosaic =  new Mosaic(ctx);
 
     const MouseEvents = {

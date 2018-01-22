@@ -20,7 +20,7 @@
  * }
  */
 class Mosaic {
-    constructor(context, { tileWidth = 20, tileHeight = 20, brushSize = 3 } = {}) {
+    constructor(context, { tileWidth = 10, tileHeight = 10, brushSize = 3 } = {}) {
         const { canvas } = context;
 
         this.context = context;
