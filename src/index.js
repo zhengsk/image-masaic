@@ -25,7 +25,7 @@ drawImageToCanvas('https://cjxq.oss.aliyuncs.com/cjxq/20180018-182801108-264-1.p
     const mosaic =  new Mosaic(ctx);
 
     const MouseEvents = {
-        bind() {
+        init() {
             mosaic.context.canvas.addEventListener('mousedown', MouseEvents.mousedown);
         },
 
@@ -47,9 +47,8 @@ drawImageToCanvas('https://cjxq.oss.aliyuncs.com/cjxq/20180018-182801108-264-1.p
             document.removeEventListener('mouseup', MouseEvents.mouseup);
         }
     }
-    MouseEvents.bind();
+    MouseEvents.init();
 
-    mosaic.drawAllTiles();
-    mosaic.eraseAllTiles();
+
 });
 
