@@ -114,8 +114,8 @@ class Mosaic {
         });
     }
 
-    drawTileByPoint(x, y) {
-        const tile = this.getTilesByPoint(x, y);
+    drawTileByPoint(x, y, isBrushSize = true) {
+        const tile = this.getTilesByPoint(x, y, isBrushSize);
         this.drawTile(tile);
     }
 
@@ -167,8 +167,8 @@ class Mosaic {
         });
     }
 
-    eraseTileByPoint(x, y) {
-        const tile = this.getTilesByPoint(x, y);
+    eraseTileByPoint(x, y, isBrushSize = true) {
+        const tile = this.getTilesByPoint(x, y, isBrushSize);
         this.eraseTile(tile);
     }
 
