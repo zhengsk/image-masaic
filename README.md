@@ -2,6 +2,12 @@
 
 Set mosaic to image by canvas.
 
+## Install
+```
+npm install image-mosaic
+```
+
+## Usage
 ```javascript
     import Mosaic from 'image-mosaic';
 
