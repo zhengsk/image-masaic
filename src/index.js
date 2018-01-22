@@ -21,7 +21,7 @@ function drawImageToCanvas(imageUrl) {
     });
 }
 
-drawImageToCanvas('https://raw.githubusercontent.com/zhengsk/image-masaic/master/src/images/demon.jpg').then(ctx => {
+drawImageToCanvas('https://raw.githubusercontent.com/zhengsk/image-masaic/master/src/images/demo.jpg').then(ctx => {
     const mosaic =  new Mosaic(ctx);
 
     const MouseEvents = {

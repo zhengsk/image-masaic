@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "dev": "webpack-dev-server --host 0.0.0.0",
+    "build": "webpack --config ./webpack.config.js",
     "release": "webpack --config ./webpack.config/release.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
