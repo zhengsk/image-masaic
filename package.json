@@ -13,7 +13,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zhengsk/canvas-masaic.git"
+    "url": "git+https://github.com/zhengsk/image-masaic.git"
   },
   "keywords": [
     "mosaic"
@@ -21,9 +21,9 @@
   "author": "zark",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/zhengsk/canvas-masaic/issues"
+    "url": "https://github.com/zhengsk/image-masaic/issues"
   },
-  "homepage": "https://github.com/zhengsk/canvas-masaic#readme",
+  "homepage": "https://github.com/zhengsk/image-masaic#readme",
   "devDependencies": {
     "babel-core": "^6.26.0",
     "babel-loader": "^7.1.2",
