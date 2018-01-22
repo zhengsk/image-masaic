@@ -8,6 +8,8 @@ module.exports = {
     output: {
         filename: 'index.js',
         path: path.resolve('./lib'),
+        library: 'imageMosaic',
+        libraryTarget: 'umd',
     },
 
     module: {
